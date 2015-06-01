@@ -1,0 +1,19 @@
+{
+  "name": "find-in-batches",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard index.js; node test.js"
+  },
+  "author": "Marc Bachmann <marc.brookman@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "standard": "^4.0.1",
+    "tape": "^4.0.0"
+  },
+  "dependencies": {
+    "async": "^1.1.0",
+    "tap-spec": "^4.0.0"
+  }
+}
