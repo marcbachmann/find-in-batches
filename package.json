@@ -1,7 +1,7 @@
 {
   "name": "find-in-batches",
   "version": "1.0.0",
-  "description": "",
+  "description": "A batch find method that uses pagination and invokes a method for each element that was returned in the find method.",
   "main": "index.js",
   "scripts": {
     "test": "standard index.js; node test.js"
@@ -15,5 +15,22 @@
   "dependencies": {
     "async": "^1.1.0",
     "tap-spec": "^4.0.0"
-  }
+  },
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcbachmann/find-in-batches.git"
+  },
+  "keywords": [
+    "batch",
+    "find",
+    "flow",
+    "pagination"
+  ],
+  "bugs": {
+    "url": "https://github.com/marcbachmann/find-in-batches/issues"
+  },
+  "homepage": "https://github.com/marcbachmann/find-in-batches#readme"
 }

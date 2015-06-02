@@ -1,8 +1,10 @@
 # find-in-batches
 
-A batch find method with that uses pagination and invokes a method for each element that was returned in the find method.
+A batch find method that uses pagination and invokes a method for each element that was returned in the find method.
 
 ## API
+findInbatches = require('find-in-batches')
+
 ### findInBatches(findMethod, options, forEach, callback)
 ```
 options = {
