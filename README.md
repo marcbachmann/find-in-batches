@@ -1,6 +1,6 @@
 # find-in-batches
 
-A batch find method that uses pagination and invokes a method for each element that was returned in the find method.
+A flow control helper method that invokes a forEach function for each element that was returned in the passed find method. This is a wrapper around [async.js](https://github.com/caolan/async) and uses simple pagination to do its magic.
 
 ## API
 
