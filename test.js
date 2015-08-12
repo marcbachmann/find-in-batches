@@ -47,7 +47,7 @@ test('Test whether errors get catched', function (t) {
     callback(err)
   }, function (err) {
     t.equal(eachCalls, 55)
-    t.equal(err.message, 'Some error', "The error gets passed to the 'end' method.")
+    t.equal(err && err.message, 'Some error', "The error gets passed to the 'end' method.")
     setTimeout(function () {
       // The 'each' method gets called in parallel.
       // So it completes the current batch and stops after that.
@@ -70,6 +70,6 @@ test('Test the arguments that get passed to the find method', function (t) {
     callback(null, [1, 2])
 
   }, noop, function (err) {
-    t.equal(err.message, 'foo')
+    t.equal(err && err.message, 'foo')
   })
 })

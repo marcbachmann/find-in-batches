@@ -1,4 +1,4 @@
-var async = require('async')
+var eachLimit = require('async').eachLimit
 var assert = require('assert')
 
 var typeAssert = function (value, type, name) {
@@ -20,7 +20,6 @@ module.exports = function (options, find, each, callback) {
   assert(find.length === 2, "The method 'find' must consist of two arguments: findMethod(options, callback)")
   assert(each.length === 2, "The method 'each' must consist of two arguments: each(data, callback)")
 
-  options = options || {}
   var maximum = options.maximum || Infinity
   var offset = options.offset || 0
   var limit = options.batchSize || 50
@@ -29,20 +28,20 @@ module.exports = function (options, find, each, callback) {
   var limitExceeded = false
   var processedDocuments = 0
 
-  async.until(function () {
-    return limitExceeded || (processedDocuments >= maximum)
-  }, function (done) {
-    find({
-      offset: offset,
-      limit: limit,
-      page: page
-    }, function (err, docs) {
-      if (err) return done(err)
-      if (!docs || docs.length !== limit) limitExceeded = true
+  function fetch () {
+    find({offset: offset, limit: limit, page: page}, function (err, docs) {
+      if (err) return callback(err)
+      if (!docs || docs.length < limit) limitExceeded = true
       page += 1
       offset += limit
       processedDocuments += limit
-      return async.eachLimit(docs, concurrency, each, done)
+      eachLimit(docs, concurrency, each, function (err) {
+        if (err) return callback(err)
+        if (limitExceeded || (processedDocuments >= maximum)) return callback(null)
+        fetch()
+      })
     })
-  }, callback)
+  }
+
+  fetch()
 }
