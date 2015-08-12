@@ -5,17 +5,18 @@ var typeAssert = function (value, type, name) {
   assert(typeof value === type, 'The argument ' + name + ' must be a ' + type + ': findInBatches(findMethod, [options], each, callback)')
 }
 
-module.exports = function (find, options, each, end) {
+module.exports = function (options, find, each, callback) {
   if (arguments.length === 3) {
-    end = each
-    each = options
-    options = undefined
+    callback = each
+    each = find
+    find = options
+    options = {}
   }
 
-  typeAssert(find, 'function', 'find')
   if (options) typeAssert(options, 'object', 'options')
+  typeAssert(find, 'function', 'find')
   typeAssert(each, 'function', 'each')
-  typeAssert(end, 'function', 'callback')
+  typeAssert(callback, 'function', 'callback')
   assert(find.length === 2, "The method 'find' must consist of two arguments: findMethod(options, callback)")
   assert(each.length === 2, "The method 'each' must consist of two arguments: each(data, callback)")
 
@@ -43,5 +44,5 @@ module.exports = function (find, options, each, end) {
       processedDocuments += limit
       return async.eachLimit(docs, concurrency, each, done)
     })
-  }, end)
+  }, callback)
 }

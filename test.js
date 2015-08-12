@@ -9,40 +9,39 @@ for (var i = 1; i < 1000; i++) {
   data.push(i)
 };
 
-
-test('Test the iteration', function(t) {
-  t.plan(2)
+test('Test the iteration', function (t) {
+  t.plan(3)
 
   var findCalls = 0
-  findMethod = function (options, callback) {
+  function findMethod (options, callback) {
     findCalls += 1
 
-    end = options.offset + options.limit
-    partial = data.slice(options.offset, end)
+    var end = options.offset + options.limit
+    var partial = data.slice(options.offset, end)
     callback(null, partial)
   }
 
   var eachCalls = 0
   var batchSize = 100
-  findInBatches(findMethod, {batchSize: batchSize}, function (data, callback) {
+  findInBatches({batchSize: batchSize}, findMethod, function (data, callback) {
     eachCalls += 1
     callback()
   }, function (err) {
+    t.equal(err, null)
     t.equal(findCalls, 10, 'The find callback gets called until it returns no more documents')
     t.equal(eachCalls, data.length, 'The each callback gets called for each item')
   })
 })
 
-
-test('Test whether errors get catched', function(t) {
+test('Test whether errors get catched', function (t) {
   t.plan(3)
 
   var eachCalls = 0
-  findInBatches(function (options, callback) {
-    partial = data.slice(options.offset, options.offset + options.limit)
+  findInBatches({batchSize: 100}, function (options, callback) {
+    var partial = data.slice(options.offset, options.offset + options.limit)
     callback(null, partial)
-  }, {batchSize: 100}, function (data, callback) {
-    var err = undefined;
+  }, function (data, callback) {
+    var err
     if (data === 55) err = new Error('Some error')
     eachCalls += 1
     callback(err)
@@ -57,22 +56,20 @@ test('Test whether errors get catched', function(t) {
   })
 })
 
-
-test('Test the arguments that get passed to the find method', function(t) {
+test('Test the arguments that get passed to the find method', function (t) {
   t.plan(5)
 
   var testLimit = 2
-  var testOffset = 0
   var iteration = 0
   var noop = function (data, callback) { callback() }
-  findInBatches(function (options, callback) {
+  findInBatches({batchSize: testLimit}, function (options, callback) {
     t.equal(options.offset, iteration * testLimit)
     t.equal(options.limit, testLimit)
     iteration += 1
-    if (iteration == 2) return callback(new Error('foo'))
+    if (iteration === 2) return callback(new Error('foo'))
     callback(null, [1, 2])
 
-  }, {batchSize: testLimit}, noop, function (err) {
+  }, noop, function (err) {
     t.equal(err.message, 'foo')
   })
 })

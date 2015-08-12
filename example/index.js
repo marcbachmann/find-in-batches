@@ -31,6 +31,6 @@ function forEach (entry, callback){
 }
 
 
-findInBatches(findMethod, {batchSize: 50}, forEach, function(err){
+findInBatches({batchSize: 50}, findMethod, forEach, function(err){
     console.log('Loaded all the entries')
 })
