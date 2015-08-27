@@ -35,9 +35,11 @@ module.exports = function (options, find, each, callback) {
       page += 1
       offset += limit
       processedDocuments += limit
+      var tooMany = processedDocuments >= maximum
+      if (tooMany) docs = docs.slice(0, docs.length - (processedDocuments - maximum))
       eachLimit(docs, concurrency, each, function (err) {
         if (err) return callback(err)
-        if (limitExceeded || (processedDocuments >= maximum)) return callback(null)
+        if (limitExceeded || tooMany) return callback(null)
         fetch()
       })
     })

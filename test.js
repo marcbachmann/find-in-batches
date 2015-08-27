@@ -73,3 +73,19 @@ test('Test the arguments that get passed to the find method', function (t) {
     t.equal(err && err.message, 'foo')
   })
 })
+
+test('Returns correct amount of elements', function (t) {
+  t.plan(1)
+
+  function findMethod (options, callback) {
+    callback(null, [1, 2, 3, 4, 5])
+  }
+
+  var arr = []
+  findInBatches({batchSize: 5, maximum: 14}, findMethod, function (data, callback) {
+    arr.push(data)
+    callback()
+  }, function (err) {
+    t.equal(arr.length, 14)
+  })
+})
