@@ -4,7 +4,7 @@ A flow control helper method that invokes a forEach function for each element th
 
 ## API
 
-### findInBatches(findMethod, options, forEach, callback)
+### findInBatches([options, ]findMethod, forEach, callback)
 ```js
 var request = require('request')
 var findInBatches = require('find-in-batches')
@@ -16,7 +16,7 @@ var options = {
     concurrency: Infinity // how many forEach methods should run simultaneously
 }
 
-findInBatches(findMethod, options, forEach, function(err){
+findInBatches(options, findMethod, forEach, function(err){
     if (err) return console.error('Failed to load the entries', err)
     console.log('Loaded all the entries')
 });
