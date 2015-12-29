@@ -20,9 +20,8 @@ module.exports = function (options, find, each, callback) {
   assert(find.length === 2, "The method 'find' must consist of two arguments: findMethod(options, callback)")
   assert(each.length === 2, "The method 'each' must consist of two arguments: each(data, callback)")
 
-  var cb = callback
-  var callbacked = 0
-  callback = function (err) { if (!callbacked++) cb(err) }
+  var exited = 0
+  function exit (err) { if (!exited++) callback(err) }
 
   var maximum = options.maximum || Infinity
   var offset = options.offset || 0
@@ -36,40 +35,43 @@ module.exports = function (options, find, each, callback) {
   var isFetching = false
 
   function fetch () {
-    if (callbacked || isFetching) return
-    if (limitExceeded) return callback(null)
+    if (exited || isFetching) return
+    if (limitExceeded) return exit(null)
+
     isFetching = true
     find({offset: offset, limit: limit, page: page}, function (err, docs) {
       isFetching = false
-      if (err) return callback(err)
+      if (err) return exit(err)
       if (!docs || docs.length < limit) limitExceeded = true
       page += 1
       offset += limit
-      processedDocuments += limit
-      var tooMany = processedDocuments >= maximum
-      if (tooMany) {
+      processedDocuments += docs.length
+      if (processedDocuments >= maximum) {
         docs = docs.slice(0, docs.length - (processedDocuments - maximum))
         limitExceeded = true
       }
+
       queue = queue.concat(docs)
+
+      // iterate through queued entries
       process()
+
+      // Prefetch documents in the background
+      if (!limitExceeded) fetch()
     })
   }
 
   function process () {
     if (isProcessing) return
     isProcessing = true
-    var completed = 0
+
     var docs = queue
     queue = []
-    eachLimit(docs, concurrency, function (doc, done) {
-      if (!completed++ && !limitExceeded) fetch()
-      each(doc, done)
-    }, function (err) {
+    eachLimit(docs, concurrency, each, function (err) {
       isProcessing = false
-      if (err) return callback(err)
-      // fetch()
-      if (queue.length == 0) fetch()
+      if (err) return exit(err)
+
+      if (queue.length === 0) fetch()
       else process()
     })
 
