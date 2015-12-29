@@ -20,6 +20,10 @@ module.exports = function (options, find, each, callback) {
   assert(find.length === 2, "The method 'find' must consist of two arguments: findMethod(options, callback)")
   assert(each.length === 2, "The method 'each' must consist of two arguments: each(data, callback)")
 
+  var cb = callback
+  var callbacked = 0
+  callback = function (err) { if (!callbacked++) cb(err) }
+
   var maximum = options.maximum || Infinity
   var offset = options.offset || 0
   var limit = options.batchSize || 50
@@ -27,23 +31,50 @@ module.exports = function (options, find, each, callback) {
   var page = 1
   var limitExceeded = false
   var processedDocuments = 0
+  var queue = []
+  var isProcessing = false
+  var isFetching = false
 
   function fetch () {
+    if (callbacked || isFetching) return
+    if (limitExceeded) return callback(null)
+    isFetching = true
     find({offset: offset, limit: limit, page: page}, function (err, docs) {
+      isFetching = false
       if (err) return callback(err)
       if (!docs || docs.length < limit) limitExceeded = true
       page += 1
       offset += limit
       processedDocuments += limit
       var tooMany = processedDocuments >= maximum
-      if (tooMany) docs = docs.slice(0, docs.length - (processedDocuments - maximum))
-      eachLimit(docs, concurrency, each, function (err) {
-        if (err) return callback(err)
-        if (limitExceeded || tooMany) return callback(null)
-        fetch()
-      })
+      if (tooMany) {
+        docs = docs.slice(0, docs.length - (processedDocuments - maximum))
+        limitExceeded = true
+      }
+      queue = queue.concat(docs)
+      process()
     })
+  }
+
+  function process () {
+    if (isProcessing) return
+    isProcessing = true
+    var completed = 0
+    var docs = queue
+    queue = []
+    eachLimit(docs, concurrency, function (doc, done) {
+      if (!completed++ && !limitExceeded) fetch()
+      each(doc, done)
+    }, function (err) {
+      isProcessing = false
+      if (err) return callback(err)
+      // fetch()
+      if (queue.length == 0) fetch()
+      else process()
+    })
+
   }
 
   fetch()
 }
+
