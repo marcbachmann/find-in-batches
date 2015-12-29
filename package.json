@@ -1,6 +1,6 @@
 {
   "name": "find-in-batches",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "A batch find method that uses pagination and invokes a method for each element that was returned in the find method.",
   "main": "index.js",
   "scripts": {
