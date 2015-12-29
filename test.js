@@ -63,14 +63,12 @@ test('Test the arguments that get passed to the find method', function (t) {
   var iteration = 0
   var noop = function (data, callback) { callback() }
   findInBatches({batchSize: testLimit}, function (options, callback) {
-    t.equal(options.offset, iteration * testLimit)
-    t.equal(options.limit, testLimit)
-    iteration += 1
-    if (iteration === 2) return callback(new Error('foo'))
+    t.equal(options.offset, iteration * testLimit, 'Expect offset to be iteration * limit')
+    t.equal(options.limit, testLimit, 'Expect limit to equal batchSize')
+    if (++iteration >= 2) return callback(new Error('foo'))
     callback(null, [1, 2])
-
   }, noop, function (err) {
-    t.equal(err && err.message, 'foo')
+    t.equal(err && err.message, 'foo', 'Expect to throw foo')
   })
 })
 
