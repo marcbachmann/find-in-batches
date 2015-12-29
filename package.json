@@ -4,7 +4,9 @@
   "description": "A batch find method that uses pagination and invokes a method for each element that was returned in the find method.",
   "main": "index.js",
   "scripts": {
-    "test": "standard index.js; node test.js"
+    "test": "standard index.js; node test.js",
+    "preversion": "npm test",
+    "afterversion": "npm publish"
   },
   "author": "Marc Bachmann <marc.brookman@gmail.com>",
   "license": "ISC",
