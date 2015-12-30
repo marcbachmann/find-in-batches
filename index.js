@@ -55,15 +55,15 @@ module.exports = function (options, find, each, callback) {
 
       // iterate through queued entries
       process()
-
-      // Prefetch documents in the background
-      if (!limitExceeded) fetch()
     })
   }
 
   function process () {
     if (isProcessing) return
     isProcessing = true
+
+    // Prefetch documents in the background
+    if (!limitExceeded) fetch()
 
     var docs = queue
     queue = []
