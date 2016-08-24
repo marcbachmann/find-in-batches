@@ -9,7 +9,7 @@ api.each = findInBatchesEach
 api.batch = findInBatches
 api.all = findInBatchesAll
 
-var eachLimit = require('async').eachLimit
+var eachLimit = require('async/eachLimit')
 function findInBatchesEach (options, find, each, callback) {
   if (typeof callback !== 'function') {
     callback = each
