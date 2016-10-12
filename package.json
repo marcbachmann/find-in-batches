@@ -16,7 +16,7 @@
     "tap-spec": "^4.0.0"
   },
   "dependencies": {
-    "async": "^2.0.1"
+    "async": "^2.1.0"
   },
   "directories": {
     "example": "example"
